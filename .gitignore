@@ -2,7 +2,11 @@
 __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
-data/
-reports/
 *.pyc
 .DS_Store
+
+data/*
+!data/**/.gitkeep
+
+reports/*
+!reports/**/.gitkeep
