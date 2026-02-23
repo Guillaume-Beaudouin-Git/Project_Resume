@@ -1,0 +1,87 @@
+# =============================================================================
+# Universe Configuration
+# =============================================================================
+# Defines the tradeable universe used in the backtest.
+# Two groups are used:
+#   - equities : liquid large-cap US stocks (signals + portfolio)
+#   - sector_etfs : SPDR sector ETFs (sector rotation module)
+
+# -------------------------------------------------------------------------
+# Equity Universe (~50 liquid US large-caps across sectors)
+# -------------------------------------------------------------------------
+equities:
+  - AAPL    # Apple
+  - MSFT    # Microsoft
+  - NVDA    # NVIDIA
+  - GOOGL   # Alphabet
+  - AMZN    # Amazon
+  - META    # Meta
+  - TSLA    # Tesla
+  - AVGO    # Broadcom
+  - JPM     # JPMorgan Chase
+  - V       # Visa
+  - MA      # Mastercard
+  - UNH     # UnitedHealth
+  - JNJ     # Johnson & Johnson
+  - LLY     # Eli Lilly
+  - PG      # Procter & Gamble
+  - HD      # Home Depot
+  - MRK     # Merck
+  - ABBV    # AbbVie
+  - COST    # Costco
+  - CRM     # Salesforce
+  - AMD     # AMD
+  - MCD     # McDonald's
+  - CAT     # Caterpillar
+  - BA      # Boeing
+  - GS      # Goldman Sachs
+  - MS      # Morgan Stanley
+  - BLK     # BlackRock
+  - CVX     # Chevron
+  - XOM     # ExxonMobil
+  - COP     # ConocoPhillips
+  - NEE     # NextEra Energy
+  - DUK     # Duke Energy
+  - SO      # Southern Company
+  - AMT     # American Tower
+  - PLD     # Prologis
+  - SCHW    # Charles Schwab
+  - AXP     # American Express
+  - PFE     # Pfizer
+  - TMO     # Thermo Fisher
+  - ABT     # Abbott
+  - NKE     # Nike
+  - SBUX    # Starbucks
+  - LOW     # Lowe's
+  - TJX     # TJX Companies
+  - RTX     # Raytheon
+  - HON     # Honeywell
+  - GE      # GE Aerospace
+  - DE      # Deere
+  - LIN     # Linde
+  - ECL     # Ecolab
+
+# -------------------------------------------------------------------------
+# Sector ETFs (for Sector Rotation module)
+# Standard SPDR Select Sector ETFs
+# -------------------------------------------------------------------------
+sector_etfs:
+  XLK: Technology
+  XLF: Financials
+  XLV: Health Care
+  XLE: Energy
+  XLI: Industrials
+  XLC: Communication Services
+  XLY: Consumer Discretionary
+  XLP: Consumer Staples
+  XLU: Utilities
+  XLRE: Real Estate
+  XLB: Materials
+
+# -------------------------------------------------------------------------
+# Minimum data requirements (to avoid thin-data artefacts)
+# -------------------------------------------------------------------------
+filters:
+  min_history_days: 504   # ~2 years of history before inclusion
+  min_price: 5.0          # exclude penny stocks
+  max_nan_pct: 0.05       # exclude if >5% of return observations are NaN

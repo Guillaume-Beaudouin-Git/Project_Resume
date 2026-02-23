@@ -1,0 +1,119 @@
+# =============================================================================
+# Strategy Configuration
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Rebalancing
+# ---------------------------------------------------------------------------
+rebalance:
+  frequency: weekly       # daily | weekly | monthly
+  day_of_week: 4          # 0=Mon … 4=Fri (used when frequency=weekly)
+  day_of_month: 1         # (used when frequency=monthly)
+
+# ---------------------------------------------------------------------------
+# Signal definitions
+# Supported types: momentum, ma_cross, breakout
+# ---------------------------------------------------------------------------
+signals:
+  momentum_3m:
+    type: momentum
+    lookback: 63          # trading days
+    skip_last: 5          # skip most recent 5 days (avoid short-term reversal)
+    enabled: true
+    weight: 0.30
+
+  momentum_6m:
+    type: momentum
+    lookback: 126
+    skip_last: 5
+    enabled: true
+    weight: 0.35
+
+  momentum_12m:
+    type: momentum
+    lookback: 252
+    skip_last: 21         # skip last month
+    enabled: true
+    weight: 0.20
+
+  ma_cross:
+    type: ma_cross
+    fast_window: 50
+    slow_window: 200
+    enabled: true
+    weight: 0.10
+
+  breakout_52w:
+    type: breakout
+    lookback: 252
+    enabled: true
+    weight: 0.05
+
+# Signal post-processing
+signal_processing:
+  normalise: crosssectional_zscore   # crosssectional_zscore | timeseries_zscore | rank
+  winsorise_sigma: 3.0               # clip at ±N sigma before normalisation
+  min_valid_assets: 10               # skip rebal if fewer assets have valid signals
+
+# ---------------------------------------------------------------------------
+# Factor combination
+# Factors available: trend, low_vol, quality
+# Weights must sum to 1.0
+# ---------------------------------------------------------------------------
+factors:
+  trend:
+    enabled: true
+    weight: 0.50
+  low_vol:
+    enabled: true
+    weight: 0.30
+    lookback: 63          # rolling window for vol estimation
+  quality:
+    enabled: true
+    weight: 0.20
+    lookback: 252         # Sharpe-proxy lookback (return / vol)
+
+# ---------------------------------------------------------------------------
+# Portfolio construction
+# ---------------------------------------------------------------------------
+portfolio:
+  long_quantile: 0.20     # top 20% → long
+  short_quantile: 0.20    # bottom 20% → short
+  long_only: false        # set true to disable short leg
+
+  # Position size constraints
+  max_weight: 0.05        # max absolute weight per asset (5%)
+  min_weight: 0.005       # positions below this are zeroed out
+
+  # Sector caps (applied to sector_etfs group)
+  sector_cap: 0.20        # max total weight in any one sector
+
+# ---------------------------------------------------------------------------
+# Volatility targeting
+# ---------------------------------------------------------------------------
+vol_targeting:
+  enabled: true
+  target_vol: 0.10        # 10% annual target portfolio volatility
+  vol_lookback: 63        # days for realised vol estimation
+  vol_floor: 0.05         # floor to avoid extreme leverage
+  vol_cap: 0.40           # cap to avoid extreme de-leveraging
+  max_leverage: 2.0       # hard cap on gross notional
+
+# ---------------------------------------------------------------------------
+# Transaction costs
+# ---------------------------------------------------------------------------
+costs:
+  half_spread_bps: 0.5    # one-way half-bid-ask spread estimate
+  market_impact_bps: 0.5  # linear market impact proxy
+  # total one-way cost = half_spread + market_impact = 1.0 bps per trade
+
+# ---------------------------------------------------------------------------
+# Sector rotation (bonus module)
+# ---------------------------------------------------------------------------
+sector_rotation:
+  enabled: true
+  lookbacks: [21, 63, 126]  # momentum lookbacks for sector scoring (days)
+  weights: [0.2, 0.4, 0.4]  # weights for each lookback
+  top_n_sectors: 5           # allocate to top N sectors
+  max_sector_weight: 0.25    # max weight per sector
+  blend_with_stock: 0.30     # proportion of final portfolio from sector overlay

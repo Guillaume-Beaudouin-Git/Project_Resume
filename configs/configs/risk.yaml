@@ -1,0 +1,85 @@
+# =============================================================================
+# Risk Overlay & Regime Detection Configuration
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Benchmark MA-200 filter
+# Logic: if benchmark close > MA(200) → risk-on multiplier
+#        else → risk-off multiplier
+# ---------------------------------------------------------------------------
+ma_filter:
+  enabled: true
+  benchmark: "SPY"
+  window: 200             # days
+  risk_on_multiplier: 1.0
+  risk_off_multiplier: 0.5
+  smooth_transition: false  # if true, use fractional distance to MA
+
+# ---------------------------------------------------------------------------
+# Volatility regime filter
+# Compares current realised vol to its own rolling history
+# ---------------------------------------------------------------------------
+vol_regime_filter:
+  enabled: true
+  benchmark: "SPY"
+  vol_window: 21          # days for current vol estimate
+  percentile_window: 252  # look-back for percentile thresholds
+  low_vol_pct: 40         # below 40th percentile → low vol regime
+  high_vol_pct: 70        # above 70th percentile → high vol regime
+
+  multipliers:
+    low_vol: 1.00
+    medium_vol: 0.85
+    high_vol: 0.60
+
+# ---------------------------------------------------------------------------
+# Drawdown control
+# Reduces exposure progressively as portfolio drawdown deepens
+# ---------------------------------------------------------------------------
+drawdown_control:
+  enabled: true
+  soft_threshold: -0.08   # -8% DD → start reducing exposure
+  hard_threshold: -0.15   # -15% DD → minimum exposure
+  min_multiplier: 0.25    # floor on drawdown multiplier
+  recovery_halflife: 10   # trading days to recover multiplier after DD narrows
+
+# ---------------------------------------------------------------------------
+# Regime detection (used for labelling & optional sizing)
+# Methods: realized_vol | hmm
+# ---------------------------------------------------------------------------
+regime:
+  method: realized_vol    # realized_vol | hmm
+
+  # --- Realised-vol regime (default) ---
+  realized_vol:
+    benchmark: "SPY"
+    vol_window: 21
+    percentile_window: 252
+    # Boundaries match vol_regime_filter above for consistency
+    thresholds:
+      low: 40             # percentile
+      high: 70            # percentile
+    labels:
+      low: "bull_low_vol"
+      medium: "bull_med_vol"
+      high: "bear_high_vol"
+
+  # --- HMM (optional, requires hmmlearn) ---
+  hmm:
+    n_states: 2
+    covariance_type: "full"
+    n_iter: 100
+    random_state: 42
+    feature: "returns"    # returns | log_returns | vol
+    state_labels:
+      0: "low_vol_state"
+      1: "high_vol_state"
+
+# ---------------------------------------------------------------------------
+# Overall exposure bounds (after all multipliers applied)
+# ---------------------------------------------------------------------------
+exposure:
+  min_gross: 0.0          # can go to fully flat
+  max_gross: 1.5          # cannot exceed 150% gross
+  min_net: -0.50          # net short limit
+  max_net: 1.00           # net long limit

@@ -1,0 +1,32 @@
+# =============================================================================
+# Data Sources Configuration
+# =============================================================================
+# Controls what data to fetch, from where, and how.
+# Source: Yahoo Finance via yfinance (free, no API key required)
+
+provider: yfinance
+
+dates:
+  start: "2010-01-01"
+  end: null          # null → today
+
+download:
+  auto_adjust: true   # use adjusted close (splits + dividends)
+  threads: true
+  progress: true
+  timeout: 30         # seconds per batch request
+  retries: 3
+
+cache:
+  raw_dir: data/raw
+  format: parquet     # parquet | csv
+  overwrite: false    # set true to force re-download
+
+benchmark:
+  ticker: "SPY"
+  name: "S&P 500 ETF"
+
+risk_free:
+  # 3-month T-Bill proxy — fetched as a ticker
+  ticker: "^IRX"
+  annualise_factor: 100.0   # ^IRX quotes as annualised %, divide by 100
